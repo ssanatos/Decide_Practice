@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decision Master - 초스피드 선택 훈련소</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;800;900&family=Outfit:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', 'Outfit', sans-serif;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+    <!-- Header / Nav -->
+    <header class="w-full max-w-4xl mx-auto px-4 py-4 flex justify-between items-center z-10">
+        <div class="flex items-center gap-3 cursor-pointer" onclick="app.showHome()">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-brand-500/30">
+                <i class="fa-solid fa-bolt text-xl text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">DECISION MASTER</h1>
+                <p class="text-xs text-brand-400 font-semibold tracking-wider uppercase">초스피드 직관 훈련소</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <button id="soundToggleBtn" onclick="app.toggleSound()" class="w-10 h-10 rounded-xl glass-card flex items-center justify-center hover:bg-slate-800 transition">
+                <i class="fa-solid fa-volume-high text-slate-300"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="w-full max-w-3xl mx-auto px-4 py-2 flex-1 flex flex-col justify-center items-center relative">
+
+        <!-- 1. HOME SCREEN & CONFIGURATION -->
+        <section id="screenHome" class="w-full flex flex-col items-center text-center py-4 space-y-6 animate-fade-in">
+            <div class="space-y-3 max-w-xl">
+                <span class="px-3 py-1 text-xs font-semibold rounded-full bg-brand-500/20 text-brand-400 border border-brand-500/30 inline-block">
+                    ⚡ 선택 에너지 및 결정 장애 극복 시뮬레이터
+                </span>
+                <h2 class="text-2xl sm:text-4xl font-extrabold text-white leading-tight">
+                    현실의 수많은 난제와 선택을<br><span class="bg-clip-text text-transparent bg-gradient-to-r from-brand-400 via-sky-400 to-indigo-400">직관으로 빠르게 결단하는 훈련</span>
+                </h2>
+                <p class="text-slate-400 text-xs sm:text-sm">
+                    업무 우선순위, 미니멀리즘 비우기, 리소스 배분, 채용, 밸런스 게임까지<br>
+                    수만 가지 동적 시나리오를 통해 뇌의 결정 피로를 극복하세요.
+                </p>
+            </div>
+
+            <!-- Custom Setup Controls -->
+            <div class="w-full glass-card p-5 rounded-2xl space-y-4 text-left border border-slate-700/60 max-w-md">
+                <h3 class="text-sm font-bold text-slate-200 border-b border-slate-700/60 pb-2 flex items-center justify-between">
+                    <span><i class="fa-solid fa-sliders text-brand-400 mr-2"></i> 훈련 난이도 및 조건 설정</span>
+                </h3>
+                
+                <div class="space-y-3 text-xs sm:text-sm">
+                    <div>
+                        <label class="block text-slate-400 font-semibold mb-1">⏱️ 문항당 시간 제한 (읽기 & 결단 시간)</label>
+                        <select id="selectTimeLimit" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white font-bold focus:outline-none focus:border-brand-500">
+                            <option value="8">8초 (여유 있는 숙고 모드)</option>
+                            <option value="5" selected>5초 (표준 추천 모드)</option>
+                            <option value="3">3초 (스피드 직관 모드)</option>
+                            <option value="2">2초 (하드코어 반사신경 모드)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-400 font-semibold mb-1">🎯 1 세션당 문제 수</label>
+                        <select id="selectRoundLength" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white font-bold focus:outline-none focus:border-brand-500">
+                            <option value="15">15문제 (빠른 숏 트레이닝)</option>
+                            <option value="30" selected>30문제 (기본 추천)</option>
+                            <option value="50">50문제 (집중 마라톤)</option>
+                            <option value="100">100문제 (일일 선택 총량 완주)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button onclick="app.startGame()" class="w-full py-4 rounded-xl bg-gradient-to-r from-brand-500 to-indigo-600 hover:from-brand-400 hover:to-indigo-500 text-white font-extrabold text-base shadow-lg shadow-brand-500/30 transition transform active:scale-95">
+                    🚀 결단 훈련 시작하기
+                </button>
+            </div>
+
+            <!-- Keyboard Guide -->
+            <div class="text-xs text-slate-500 flex items-center gap-4 pt-1">
+                <span><kbd class="px-2 py-1 bg-slate-800 rounded border border-slate-700 text-slate-300">←</kbd> / <kbd class="px-2 py-1 bg-slate-800 rounded border border-slate-700 text-slate-300">A</kbd> : 왼쪽 선택</span>
+                <span><kbd class="px-2 py-1 bg-slate-800 rounded border border-slate-700 text-slate-300">→</kbd> / <kbd class="px-2 py-1 bg-slate-800 rounded border border-slate-700 text-slate-300">D</kbd> : 오른쪽 선택</span>
+            </div>
+        </section>
+
+        <!-- 2. GAME PLAY SCREEN -->
+        <section id="screenGame" class="w-full hidden flex-col items-center space-y-4">
+            
+            <!-- Top Status Bar -->
+            <div class="w-full glass-card p-3 sm:p-4 rounded-2xl flex items-center justify-between gap-2 text-xs sm:text-sm">
+                <!-- Energy Meter -->
+                <div class="flex items-center gap-2 flex-1 max-w-[160px] sm:max-w-[200px]">
+                    <i class="fa-solid fa-battery-three-quarters text-emerald-400 text-base"></i>
+                    <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                        <div id="energyBar" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full w-full transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <!-- Combo -->
+                <div class="flex items-center gap-1 font-bold">
+                    <span class="text-slate-400">연속</span>
+                    <span id="comboText" class="text-amber-400 text-base sm:text-lg font-black">0</span>
+                    <span id="multiplierText" class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">x1.0</span>
+                </div>
+
+                <!-- Progress / Avg Speed -->
+                <div class="text-right">
+                    <div id="progressText" class="font-extrabold text-white text-sm sm:text-base">0 / 30</div>
+                    <div id="avgTimeText" class="text-[11px] text-slate-400">평균 0.00초</div>
+                </div>
+            </div>
+
+            <!-- Timer Bar -->
+            <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden relative shadow-inner">
+                <div id="timerBar" class="bg-gradient-to-r from-brand-500 via-sky-400 to-amber-400 h-full w-full transition-all duration-75"></div>
+            </div>
+
+            <!-- Card Container -->
+            <div id="cardWrapper" class="w-full relative min-h-[260px] sm:min-h-[300px] flex items-center justify-center">
+                <div id="decisionCard" class="w-full glass-card p-6 rounded-3xl shadow-2xl flex flex-col justify-between items-center text-center relative border border-slate-700/60 transition-all duration-150">
+                    
+                    <!-- Category Badge -->
+                    <div class="flex items-center justify-between w-full mb-3">
+                        <span id="categoryBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-brand-500/20 text-brand-400 border border-brand-500/30 flex items-center gap-2">
+                            <i id="categoryIcon" class="fa-solid fa-briefcase"></i>
+                            <span id="categoryName">업무 & 리소스</span>
+                        </span>
+                        <span class="text-[11px] font-semibold text-slate-400 bg-slate-800 px-2.5 py-1 rounded-full border border-slate-700">
+                            직관 반응 필요
+                        </span>
+                    </div>
+
+                    <!-- Question Text -->
+                    <div class="my-auto py-2 space-y-2">
+                        <h3 id="questionText" class="text-lg sm:text-2xl font-black text-white leading-snug">
+                            질문 템플릿 로딩 중...
+                        </h3>
+                        <p id="subContextText" class="text-xs sm:text-sm text-slate-400 font-medium">
+                            추가 상세 배경 설명
+                        </p>
+                    </div>
+
+                    <div class="w-full flex justify-between text-[11px] text-slate-500 font-semibold pt-3 border-t border-slate-800/80">
+                        <span>← Left / Key A</span>
+                        <span>Right / Key D →</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Option Buttons -->
+            <div class="grid grid-cols-2 gap-3 sm:gap-4 w-full pt-1">
+                <button id="btnChoiceA" onclick="app.makeDecision('A')" class="py-4 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-95 text-white font-extrabold shadow-lg shadow-emerald-900/30 flex flex-col items-center justify-center transition-all">
+                    <span id="labelOptionA" class="text-sm sm:text-base text-center leading-snug">옵션 A</span>
+                    <span class="text-[10px] text-emerald-200 font-medium opacity-80 mt-1">[←] / [A] 키</span>
+                </button>
+                <button id="btnChoiceB" onclick="app.makeDecision('B')" class="py-4 px-4 rounded-2xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 active:scale-95 text-white font-extrabold shadow-lg shadow-rose-900/30 flex flex-col items-center justify-center transition-all">
+                    <span id="labelOptionB" class="text-sm sm:text-base text-center leading-snug">옵션 B</span>
+                    <span class="text-[10px] text-rose-200 font-medium opacity-80 mt-1">[→] / [D] 키</span>
+                </button>
+            </div>
+
+        </section>
+
+        <!-- 3. RESULT SCREEN -->
+        <section id="screenResult" class="w-full hidden flex-col items-center py-4 space-y-5 animate-fade-in">
+            <div class="text-center space-y-1">
+                <div class="inline-block p-3 rounded-2xl bg-brand-500/20 text-brand-400 mb-1">
+                    <i class="fa-solid fa-award text-3xl"></i>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-black text-white">결정 세션 완료!</h2>
+                <p class="text-slate-400 text-xs sm:text-sm">의사결정 속도 및 결정력 분석 결과</p>
+            </div>
+
+            <!-- Persona Summary -->
+            <div class="w-full glass-card p-5 rounded-3xl text-center border-brand-500/40">
+                <div class="text-xs font-bold text-brand-400 uppercase tracking-widest mb-1">의사결정 성향 유형</div>
+                <div id="personaTitle" class="text-xl sm:text-2xl font-black text-white bg-clip-text text-transparent bg-gradient-to-r from-brand-400 to-indigo-300">
+                    전광석화 결단가
+                </div>
+                <p id="personaDesc" class="text-slate-300 text-xs sm:text-sm mt-2 max-w-md mx-auto">
+                    망설임 없이 결정을 완료했습니다. 인지 에너지를 효율적으로 보호하고 계십니다.
+                </p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full">
+                <div class="glass-card p-3 rounded-2xl text-center">
+                    <div class="text-xs text-slate-400 font-medium">완료 선택</div>
+                    <div id="statTotalCount" class="text-xl font-extrabold text-white mt-0.5">30</div>
+                </div>
+                <div class="glass-card p-3 rounded-2xl text-center">
+                    <div class="text-xs text-slate-400 font-medium">평균 반응속도</div>
+                    <div id="statAvgTime" class="text-xl font-extrabold text-brand-400 mt-0.5">0.84초</div>
+                </div>
+                <div class="glass-card p-3 rounded-2xl text-center">
+                    <div class="text-xs text-slate-400 font-medium">최대 연속 콤보</div>
+                    <div id="statMaxCombo" class="text-xl font-extrabold text-amber-400 mt-0.5">18</div>
+                </div>
+                <div class="glass-card p-3 rounded-2xl text-center">
+                    <div class="text-xs text-slate-400 font-medium">에너지 보존율</div>
+                    <div id="statSavedEnergy" class="text-xl font-extrabold text-emerald-400 mt-0.5">+92%</div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-3 w-full pt-1">
+                <button onclick="app.startGame()" class="flex-1 py-3.5 rounded-2xl bg-brand-500 hover:bg-brand-400 text-white font-extrabold text-sm shadow-lg shadow-brand-500/30 transition">
+                    <i class="fa-solid fa-rotate-right mr-2"></i> 동일 옵션 다시 도전
+                </button>
+                <button onclick="app.showHome()" class="flex-1 py-3.5 rounded-2xl glass-card hover:bg-slate-800 text-slate-200 font-bold text-sm transition">
+                    <i class="fa-solid fa-sliders mr-2"></i> 설정 및 모드 변경
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full max-w-4xl mx-auto px-4 py-3 text-center text-[11px] text-slate-500">
+        <p>Decision Master Training System &bull; 인지적 자의식 고갈(Decision Fatigue) 방지 훈련 키트</p>
+    </footer>
+
+    <!-- ENGINE CODE -->
+    <script>
+        // Sound System
+        class SoundFX {
+            constructor() { this.ctx = null; this.muted = false; }
+            init() { if (!this.ctx) { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } }
+            playClick() {
+                if (this.muted) return; this.init();
+                const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
+                osc.type = 'sine'; osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(200, this.ctx.currentTime + 0.05);
+                gain.gain.setValueAtTime(0.15, this.ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.05);
+            }
+            playTimeout() {
+                if (this.muted) return; this.init();
+                const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(180, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(80, this.ctx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.2, this.ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.2);
+            }
+        }
+
+        // Categories Definition
+        const CATEGORIES = [
+            { id: 'work_priority', name: '업무 & 우선순위', icon: 'fa-briefcase', color: 'text-sky-400' },
+            { id: 'resource', name: '자원 배분 & 예산', icon: 'fa-chart-pie', color: 'text-emerald-400' },
+            { id: 'hiring', name: '채용 & 팀 구성', icon: 'fa-user-group', color: 'text-indigo-400' },
+            { id: 'declutter', name: '비우기 & 정리정돈', icon: 'fa-box-archive', color: 'text-amber-400' },
+            { id: 'career', name: '커리어 & 방향성', icon: 'fa-compass', color: 'text-purple-400' },
+            { id: 'conflict', name: '의견 조율 & 갈등', icon: 'fa-handshake', color: 'text-rose-400' },
+            { id: 'micro', name: '일상 & 루틴', icon: 'fa-bolt', color: 'text-teal-400' },
+            { id: 'balance', name: '밸런스 & 난제', icon: 'fa-scale-balanced', color: 'text-pink-400' }
+        ];
+
+        // MASSIVE TEMPLATE BANK (Numeric & Non-numeric real-world situations)
+        const EXPANDED_TEMPLATES = [
+            // 1. WORKPLACE & PROJECT PRIORITIZATION
+            {
+                cat: 'work_priority',
+                template: "배포 직전, {bugSeverity} 버그가 발견되었다. 어떻게 할 것인가?",
+                sub: "출시 일정이 임박한 상황",
+                optA: "일정 연기 후 버그 수정", optB: "우선 배포 후 핫픽스 처리",
+                vars: { bugSeverity: ["마이너한 UI 픽셀 깨짐", "특정 브라우저 간헐적 오류", "일부 사용자 데이터 로딩 지연"] }
+            },
+            {
+                cat: 'work_priority',
+                template: "개발 팀 리소스가 부족하다. 무엇을 먼저 처리하겠는가?",
+                sub: "스프린트 마감 3일 전",
+                optA: "{hoursA}시간 소요되는 레거시 코드 리팩토링", optB: "{hoursB}시간 소요되는 신규 요청 기능 개발",
+                vars: { hoursA: [10, 15, 20], hoursB: [8, 12, 16] }
+            },
+            {
+                cat: 'work_priority',
+                template: "임원이 당장 {projectType} 관련 보고서 수정을 요청했다. 나의 대응은?",
+                sub: "현재 진행 중인 핵심 업무 몰입 중",
+                optA: "하던 일 중단하고 임원 요청 즉시 처리", optB: "마감 시각 확인 후 기존 업무 마치고 처리",
+                vars: { projectType: ["분기 매출 실적", "신규 사업 전략", "인프라 개선안", "고객 이탈 분석"] }
+            },
+
+            // 2. RESOURCE ALLOCATION & BUDGETING
+            {
+                cat: 'resource',
+                template: "{budget}원의 여유 예산이 남았다. 어디에 투입하겠는가?",
+                sub: "다음 분기 목표 달성을 위한 결정",
+                optA: "신규 유저 획득 마케팅 집행", optB: "기존 고객 리텐션 이벤트 및 혜택",
+                vars: { budget: ["1,000만", "3,000만", "5,000만", "1억"] }
+            },
+            {
+                cat: 'resource',
+                template: "팀 서버 용량이 초과 직전이다. 어떤 결정을 내릴 것인가?",
+                sub: "월 비용 증가 vs 시스템 관리 공수",
+                optA: "월 {cost}원 내고 클라우드 인프라 증설", optB: "오래된 로그/데이터 정리 작업 수행",
+                vars: { cost: ["50만", "150만", "300만"] }
+            },
+            {
+                cat: 'resource',
+                template: "고객 문의(CS) 폭주로 팀원이 지쳤다. 예산 집행 방식은?",
+                sub: "단기 해결 vs 장기 자동화",
+                optA: "아웃소싱 CS 대행업체 계약", optB: "자동화 챗봇 및 FAQ 대대적 개편",
+                vars: {}
+            },
+
+            // 3. HIRING & TEAM DYNAMICS
+            {
+                cat: 'hiring',
+                template: "최종 면접 후보자 2명 중 누구를 채용하겠는가?",
+                sub: "팀 신규 지원자 결정",
+                optA: "독보적 실력이나 개인주의 성향 지원자", optB: "실력은 무난하나 뛰어난 협업 성향 지원자",
+                vars: {}
+            },
+            {
+                cat: 'hiring',
+                template: "주요 프로젝트 리더로 누구를 임명하겠는가?",
+                sub: "팀 내부 인재 발탁",
+                optA: "경력 {yearsA}년의 데이터 중심 신중파", optB: "경력 {yearsB}년의 추진력 있는 실행파",
+                vars: { yearsA: [7, 8, 10], yearsB: [3, 4, 5] }
+            },
+
+            // 4. DECLUTTERING & MINIMALISM (NON-NUMERIC & NUMERIC)
+            {
+                cat: 'declutter',
+                template: "{months}개월 동안 한 번도 쓰지 않은 {item}이(가) 있다. 어떻게 할 것인가?",
+                sub: "집안 정리 중 발견한 물품",
+                optA: "즉시 중고 판매 또는 폐기", optB: "언젠가 쓸지 모르니 보관",
+                vars: {
+                    months: [6, 12, 24, 36],
+                    item: ["고가의 운동기구", "추억의 전자기기", "택도 안 띤 옷", "취미용 미술용품", "캠핑 장비"]
+                }
+            },
+            {
+                cat: 'declutter',
+                template: "책상 위 쌓인 서류와 종이 문서들, 어떻게 처리할 것인가?",
+                sub: "사무 공간 정리 정돈",
+                optA: "모두 스캔 후 종이는 전량 파쇄", optB: "카테고리별 바인더 정리 후 보관",
+                vars: {}
+            },
+            {
+                cat: 'declutter',
+                template: "스마트폰 사진첩에 사진이 {count}장 쌓였다. 내 선택은?",
+                sub: "저장 공간 부족 알림 발생",
+                optA: "주말에 시간 내서 대대적 삭제 정돈", optB: "월 {price}원 내고 클라우드 용량 업그레이드",
+                vars: { count: ["15,000", "30,000"], price: ["3,300", "8,900"] }
+            },
+
+            // 5. CAREER & LIFE DIRECTION
+            {
+                cat: 'career',
+                template: "이직 제안이 왔다. 어디를 선택하겠는가?",
+                sub: "커리어 분기점 선택",
+                optA: "연봉 {payA} 인상 + 높은 야근 및 업무 압박", optB: "현재 연봉 유지 + 완벽한 칼퇴 & 자유도",
+                vars: { payA: ["30%", "50%", "70%"] }
+            },
+            {
+                cat: 'career',
+                template: "새로운 기술 스택 또는 업무 분야를 도전할 기회가 왔다.",
+                sub: "자기계발 및 성장 선택",
+                optA: "기존에 가장 잘하는 분야의 전문성 극대화", optB: "낯설지만 시장 가치가 높은 신기술로 전환",
+                vars: {}
+            },
+
+            // 6. CONFLICT RESOLUTION & STAKEHOLDERS
+            {
+                cat: 'conflict',
+                template: "{roleA}와 {roleB}의 의견이 정반대로 팽팽히 맞선다. 누구 손을 들어줄 것인가?",
+                sub: "의사결정권자로서의 선택",
+                optA: "{roleA}의 안정성 중심 주장 수용", optB: "{roleB}의 속도 중심 주장 수용",
+                vars: {
+                    roleA: ["시니어 개발자", "재무 담당자", "보안 최고 책임자"],
+                    roleB: ["마케팅 팀장", "영업 담당 이사", "기획자"]
+                }
+            },
+            {
+                cat: 'conflict',
+                template: "고객이 요구하는 서비스 무상 수정 범위가 계약을 초과했다.",
+                sub: "고객 관계 vs 팀 실리",
+                optA: "관계 유지를 위해 무료로 해준다", optB: "추가 비용 견적서를 단호히 발송한다",
+                vars: {}
+            },
+
+            // 7. MICRO HABITS & DAILY ROUTINES
+            {
+                cat: 'micro',
+                template: "아침 알람 소리! 당신의 선택은?",
+                sub: "오전 6시 30분 상황",
+                optA: "즉시 일어나서 스트레칭/운동", optB: "30분 더 푹 자고 컨디션 조절",
+                vars: {}
+            },
+            {
+                cat: 'micro',
+                template: "지하철 대기 중 {mins}분의 자율 시간이 생겼다.",
+                sub: "자투리 시간 활용",
+                optA: "아티클 / 독서 읽기", optB: "멍하니 뇌 휴식하기",
+                vars: { mins: [10, 15, 20] }
+            },
+
+            // 8. FUN & EXTREME BALANCE GAMES
+            {
+                cat: 'balance',
+                template: "평생 하나만 선택해야 한다면?",
+                sub: "극단적 밸런스 게임",
+                optA: "모든 음식 맛을 3배로 느끼기", optB: "아무리 먹어도 살 절대 안찌기",
+                vars: {}
+            },
+            {
+                cat: 'balance',
+                template: "어떤 초능력을 얻겠는가?",
+                sub: "초능력 선택 난제",
+                optA: "과거로 {years}년 시간 여행하기", optB: "미래로 {years}년 시간 여행하기",
+                vars: { years: [5, 10, 20] }
+            }
+        ];
+
+        class QuestionGenerator {
+            static generate() {
+                const tmpl = EXPANDED_TEMPLATES[Math.floor(Math.random() * EXPANDED_TEMPLATES.length)];
+                const category = CATEGORIES.find(c => c.id === tmpl.cat) || CATEGORIES[0];
+                
+                let text = tmpl.template;
+                let optA = tmpl.optA;
+                let optB = tmpl.optB;
+                let sub = tmpl.sub;
+
+                if (tmpl.vars) {
+                    for (const [key, val] of Object.entries(tmpl.vars)) {
+                        let selectedVal = "";
+                        if (typeof val === 'function') {
+                            selectedVal = val();
+                        } else if (Array.isArray(val)) {
+                            selectedVal = val[Math.floor(Math.random() * val.length)];
+                        }
+                        
+                        const formattedVal = (typeof selectedVal === 'number' && selectedVal > 999) 
+                            ? selectedVal.toLocaleString('ko-KR') 
+                            : selectedVal;
+
+                        text = text.replace(new RegExp(`{${key}}`, 'g'), formattedVal);
+                        optA = optA.replace(new RegExp(`{${key}}`, 'g'), formattedVal);
+                        optB = optB.replace(new RegExp(`{${key}}`, 'g'), formattedVal);
+                        sub = sub.replace(new RegExp(`{${key}}`, 'g'), formattedVal);
+                    }
+                }
+
+                return { category, text, sub, optA, optB };
+            }
+        }
+
+        class GameApp {
+            constructor() {
+                this.sound = new SoundFX();
+                
+                this.isPlaying = false;
+                this.currentQuestion = null;
+                this.questionStartTime = 0;
+                this.timerId = null;
+                this.timeLeftMs = 0;
+                this.maxTimeMs = 5000;
+
+                this.count = 0;
+                this.targetCount = 30;
+                this.combo = 0;
+                this.maxCombo = 0;
+                this.energy = 100;
+                this.responseTimes = [];
+
+                this.elHome = document.getElementById('screenHome');
+                this.elGame = document.getElementById('screenGame');
+                this.elResult = document.getElementById('screenResult');
+
+                this.bindEvents();
+            }
+
+            toggleSound() {
+                this.sound.muted = !this.sound.muted;
+                document.getElementById('soundToggleBtn').innerHTML = this.sound.muted
+                    ? '<i class="fa-solid fa-volume-xmark text-rose-400"></i>'
+                    : '<i class="fa-solid fa-volume-high text-slate-300"></i>';
+            }
+
+            showHome() {
+                this.isPlaying = false;
+                clearInterval(this.timerId);
+                this.elHome.classList.remove('hidden');
+                this.elGame.classList.add('hidden');
+                this.elResult.classList.add('hidden');
+            }
+
+            startGame() {
+                const timeSec = parseFloat(document.getElementById('selectTimeLimit').value);
+                const roundLen = parseInt(document.getElementById('selectRoundLength').value);
+
+                this.maxTimeMs = timeSec * 1000;
+                this.targetCount = roundLen;
+
+                this.isPlaying = true;
+                this.count = 0;
+                this.combo = 0;
+                this.maxCombo = 0;
+                this.energy = 100;
+                this.responseTimes = [];
+
+                this.elHome.classList.add('hidden');
+                this.elResult.classList.add('hidden');
+                this.elGame.classList.remove('hidden');
+                this.elGame.classList.add('flex');
+
+                this.nextQuestion();
+            }
+
+            nextQuestion() {
+                if (!this.isPlaying) return;
+
+                if (this.count >= this.targetCount || this.energy <= 0) {
+                    this.endGame();
+                    return;
+                }
+
+                this.currentQuestion = QuestionGenerator.generate();
+                this.renderCard();
+
+                clearInterval(this.timerId);
+
+                this.timeLeftMs = this.maxTimeMs;
+                this.questionStartTime = performance.now();
+                
+                const interval = 50;
+                this.timerId = setInterval(() => {
+                    this.timeLeftMs -= interval;
+                    this.updateTimerUI();
+
+                    if (this.timeLeftMs <= 0) {
+                        this.handleTimeout();
+                    }
+                }, interval);
+            }
+
+            renderCard() {
+                const q = this.currentQuestion;
+                const card = document.getElementById('decisionCard');
+
+                card.className = "w-full glass-card p-6 rounded-3xl shadow-2xl flex flex-col justify-between items-center text-center relative border border-slate-700/60 transition-all duration-150";
+
+                document.getElementById('categoryIcon').className = `fa-solid ${q.category.icon}`;
+                document.getElementById('categoryName').innerText = q.category.name;
+                document.getElementById('categoryBadge').className = `px-3 py-1 rounded-full text-xs font-bold bg-slate-800 ${q.category.color} border border-slate-700 flex items-center gap-2`;
+
+                document.getElementById('questionText').innerText = q.text;
+                document.getElementById('subContextText').innerText = q.sub || "";
+
+                document.getElementById('labelOptionA').innerText = q.optA;
+                document.getElementById('labelOptionB').innerText = q.optB;
+
+                document.getElementById('comboText').innerText = this.combo;
+                const mult = (1 + Math.floor(this.combo / 5) * 0.2).toFixed(1);
+                document.getElementById('multiplierText').innerText = `x${mult}`;
+
+                document.getElementById('progressText').innerText = `${this.count} / ${this.targetCount}`;
+
+                const avg = this.responseTimes.length > 0 
+                    ? (this.responseTimes.reduce((a, b) => a + b, 0) / this.responseTimes.length / 1000).toFixed(2)
+                    : "0.00";
+                document.getElementById('avgTimeText').innerText = `평균 ${avg}초`;
+
+                this.updateEnergyUI();
+            }
+
+            updateTimerUI() {
+                const percent = Math.max(0, (this.timeLeftMs / this.maxTimeMs) * 100);
+                const bar = document.getElementById('timerBar');
+                bar.style.width = `${percent}%`;
+
+                if (percent < 30) {
+                    bar.className = "bg-gradient-to-r from-rose-600 to-pink-500 h-full w-full transition-all duration-75 animate-pulse";
+                } else {
+                    bar.className = "bg-gradient-to-r from-brand-500 via-sky-400 to-amber-400 h-full w-full transition-all duration-75";
+                }
+            }
+
+            updateEnergyUI() {
+                const bar = document.getElementById('energyBar');
+                bar.style.width = `${this.energy}%`;
+                if (this.energy < 30) {
+                    bar.className = "bg-gradient-to-r from-rose-500 to-red-600 h-full transition-all duration-300";
+                } else {
+                    bar.className = "bg-gradient-to-r from-emerald-500 to-teal-400 h-full transition-all duration-300";
+                }
+            }
+
+            makeDecision(choice) {
+                if (!this.isPlaying) return;
+
+                clearInterval(this.timerId);
+                const elapsedMs = performance.now() - this.questionStartTime;
+                this.responseTimes.push(elapsedMs);
+
+                this.sound.playClick();
+
+                this.count++;
+                this.combo++;
+                if (this.combo > this.maxCombo) this.maxCombo = this.combo;
+
+                if (elapsedMs < (this.maxTimeMs * 0.4)) {
+                    this.energy = Math.min(100, this.energy + 3);
+                }
+
+                this.nextQuestion();
+            }
+
+            handleTimeout() {
+                if (!this.isPlaying) return;
+
+                clearInterval(this.timerId);
+                this.sound.playTimeout();
+
+                this.combo = 0;
+                this.energy = Math.max(0, this.energy - 20);
+
+                this.responseTimes.push(this.maxTimeMs);
+                this.count++;
+
+                this.nextQuestion();
+            }
+
+            endGame() {
+                this.isPlaying = false;
+                clearInterval(this.timerId);
+
+                this.elGame.classList.add('hidden');
+                this.elResult.classList.remove('hidden');
+                this.elResult.classList.add('flex');
+
+                this.renderAnalytics();
+            }
+
+            renderAnalytics() {
+                const total = this.responseTimes.length;
+                if (total === 0) return;
+
+                const avgTimeMs = this.responseTimes.reduce((a, b) => a + b, 0) / total;
+                const avgSec = (avgTimeMs / 1000).toFixed(2);
+
+                document.getElementById('statTotalCount').innerText = total;
+                document.getElementById('statAvgTime').innerText = `${avgSec}초`;
+                document.getElementById('statMaxCombo').innerText = this.maxCombo;
+
+                const savedPercent = Math.min(99, Math.max(40, Math.round((1 - (avgTimeMs / (this.maxTimeMs * 1.2))) * 100)));
+                document.getElementById('statSavedEnergy').innerText = `+${savedPercent}%`;
+
+                let title = "";
+                let desc = "";
+
+                if (avgTimeMs < 1500) {
+                    title = "⚡ 전광석화 과단형";
+                    desc = "망설임 따위는 전혀 없습니다! 본능적 직관으로 인지 에너지를 완벽히 보존하며 압도적 속도로 결정을 내립니다.";
+                } else if (avgTimeMs < 3000) {
+                    title = "🎯 유연한 신속 실행가";
+                    desc = "질문을 명확히 읽고 핵심 쟁점을 빠르게 정제하여 결론을 내립니다. 가장 합리적이고 지치지 않는 결단 템포입니다.";
+                } else {
+                    title = "🔍 신중한 완벽주의 숙고가";
+                    desc = "시간을 다소 소모하며 완벽한 결정을 내리려 합니다. 사소하거나 중대한 선택에서 '오류도 피드백이다'라는 마음가짐을 가져보세요.";
+                }
+
+                document.getElementById('personaTitle').innerText = title;
+                document.getElementById('personaDesc').innerText = desc;
+            }
+
+            bindEvents() {
+                window.addEventListener('keydown', (e) => {
+                    if (!this.isPlaying) return;
+                    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+                        this.makeDecision('A');
+                    } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+                        this.makeDecision('B');
+                    }
+                });
+
+                let touchStartX = 0;
+                let touchEndX = 0;
+                const wrapper = document.getElementById('cardWrapper');
+                
+                wrapper.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                }, { passive: true });
+
+                wrapper.addEventListener('touchend', (e) => {
+                    if (!this.isPlaying) return;
+                    touchEndX = e.changedTouches[0].screenX;
+                    const diff = touchEndX - touchStartX;
+
+                    if (Math.abs(diff) > 40) {
+                        if (diff < 0) this.makeDecision('A');
+                        else this.makeDecision('B');
+                    }
+                }, { passive: true });
+            }
+        }
+
+        let app;
+        window.onload = () => {
+            app = new GameApp();
+        };
+    </script>
+</body>
+</html>
